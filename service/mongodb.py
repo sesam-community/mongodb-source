@@ -4,7 +4,6 @@ import json
 from bson import ObjectId
 from datetime import datetime
 
-
 # encode MongoDB BSON as JSON
 class JSONEncoder(json.JSONEncoder):
     def default(self, o):
@@ -17,10 +16,19 @@ class JSONEncoder(json.JSONEncoder):
 
 class MongoDB(object):
 
-    # FIXME: authentication with secret
-    def __init__(self, host, port, database, username=None, password=None, secret=None):
-        self._client = pymongo.MongoClient('mongodb://{host}:{port}'
-                                           ''.format(host=host, port=port))
+#    def __init__(self, host, port, database, username=None, password=None, authSource='admin'):
+
+        # self._client = pymongo.MongoClient('mongodb://{username}:{password}@{host}:{port}/{database}?authSource={authSource}'
+        #                                ''.format(username=username, password=password, host=host, port=port, database=database, authSource=authSource))
+
+        # self._uri = 'mongodb://{username}:{password}@{host}:{port}/{database}?authSource={authSource}'\
+        #     .format(username=username, password=password, host=host, port=port, database=database, authSource=authSource)
+        #
+        # self.__init__(self._uri, database)
+
+    def __init__(self, uri, database):
+
+        self._client = pymongo.MongoClient(uri)
         self._db = self._client[database]
 #        self._db.authenticate(username, password)
 
