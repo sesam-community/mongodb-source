@@ -16,6 +16,8 @@
 
 `MONGODB_PASSWORD` the password of database user
 
+`MONGODB_AUTHSOURCE` the authentication database _(default: admin)_
+
 ### Or
 `MONGODB_DATABASE` the database to fetch data from
 
@@ -23,6 +25,11 @@
 
 
 ## Docker
+
+Image:
+
+https://hub.docker.com/r/gamh/mongodb-source-service/
+
 
 Build and add:
 
