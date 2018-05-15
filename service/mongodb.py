@@ -16,24 +16,12 @@ class JSONEncoder(json.JSONEncoder):
 
 class MongoDB(object):
 
-#    def __init__(self, host, port, database, username=None, password=None, authSource='admin'):
-
-        # self._client = pymongo.MongoClient('mongodb://{username}:{password}@{host}:{port}/{database}?authSource={authSource}'
-        #                                ''.format(username=username, password=password, host=host, port=port, database=database, authSource=authSource))
-
-        # self._uri = 'mongodb://{username}:{password}@{host}:{port}/{database}?authSource={authSource}'\
-        #     .format(username=username, password=password, host=host, port=port, database=database, authSource=authSource)
-        #
-        # self.__init__(self._uri, database)
-
     def __init__(self, uri, database):
-
         self._client = pymongo.MongoClient(uri)
         self._db = self._client[database]
 #        self._db.authenticate(username, password)
 
     def __get_all_entities(self, collection):
-
         for entity in self._db[collection].find():
             return JSONEncoder().encode(entity)
 
