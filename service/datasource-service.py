@@ -1,30 +1,55 @@
+#!/usr/bin/env python3
+
 from flask import Flask, request, Response
 import os
 import mongodb
+import logging
+import datetime
+import json
 
 app = Flask(__name__)
 
 # fetch env vars
-
-# "mongodb://minprofil-creditcard:${keyvault:webapps-test-kv:minprofil-creditcard-api-mongodb-password-stage}@10.220.100.12:27023,10.220.100.13:27023,10.220.100.14:27023/minprofil-creditcard?authSource=admin"
-
 mongodb_host = os.getenv('MONGODB_HOST', 'localhost')
 mongodb_port = os.getenv('MONGODB_PORT', 27017)
-
-mongodb_database = os.getenv('MONGODB_DATABASE', 'test')
+mongodb_database = os.getenv('MONGODB_DATABASE')
 mongodb_username = os.getenv('MONGODB_USERNAME')
 mongodb_password = os.getenv('MONGODB_PASSWORD')
-mongodb_secret = os.getenv('MONGODB_SECRET')
+mongodb_authSource = os.getenv('MONGODB_AUTHSOURCE', 'admin')
+mongodb_connection_string = os.getenv('MONGODB_CONNECTION_STRING')  # 'mongodb://test:test@localhost:27017/test?authSource=admin'
 
-mdb = mongodb.MongoDB(mongodb_host, mongodb_port, mongodb_database, mongodb_username, mongodb_password, mongodb_secret)
+# set logging
+log_level = logging.getLevelName(os.environ.get('LOG_LEVEL', 'INFO'))  # default log level = INFO
+logging.basicConfig(level=log_level)  # dump log to stdout
+
+
+# build the connection string
+uri = ""
+
+if mongodb_connection_string is None:
+    uri = 'mongodb://{username}:{password}@{host}:{port}/{database}?authSource={authSource}'\
+             .format(username=mongodb_username, password=mongodb_password, host=mongodb_host, port=mongodb_port, database=mongodb_database, authSource=mongodb_authSource)
+else:
+    uri = mongodb_connection_string
 
 
 @app.route('/<collection>')
 def get_entities(collection):
+
+    # debug
+    logging.info(datetime.datetime.now())
+    logging.info('connecting to:')
+    logging.info('  mongodb://{username}:{password}@{host}:{port}/{database}?authSource={authSource}'\
+             .format(username=mongodb_username, password='<password>', host=mongodb_host, port=mongodb_port, database=mongodb_database, authSource=mongodb_authSource))
+    logging.info("  collection: %s" % collection)
+
+    mdb = mongodb.MongoDB(uri, mongodb_database)
     since = request.args.get('since')
     entities = mdb.get_entities(collection, since)
-    return Response(entities, mimetype='application/json')
+
+    # JSON encode result
+    return Response(json.dumps(entities, separators=(',', ': ')), mimetype='application/json')
 
 
 if __name__ == '__main__':
-    app.run(threaded=True, debug=True, host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0', port=5000)
