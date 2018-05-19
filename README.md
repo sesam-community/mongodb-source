@@ -26,6 +26,10 @@ A python micro service for receiving a JSON entity stream from a MongoDB.
 
 `MONGODB_CONNECTION_STRING` a full connection string
 
+### Optional
+
+`LOG_LEVEL` the level of logging _(default: INFO)_ (Ref: https://docs.python.org/3/howto/logging.html#logging-levels)
+
 
 ## Docker
 
@@ -66,7 +70,9 @@ endpoint:
   "source": {
     "type": "json",
     "system": "mongodb-system-id",
-    "url": "/<collection>"
+    "url": "/booking"
   }
 }
 ```
+
+to fetch entities from the `booking` collection
