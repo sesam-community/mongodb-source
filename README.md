@@ -56,7 +56,7 @@ endpoint:
       "MONGODB_CONNECTION_STRING": "mongodb://testuser:123465@localhost:27017/test?authSource=admin",
       "MONGODB_DATABASE": "test"
     },
-    "image": "gamh/mongodb-source-service:latest",
+    "image": "sesamcommunity/mongodb-source:v1.0.5",
     "port": 5000
   }
 }
