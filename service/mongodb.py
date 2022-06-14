@@ -33,6 +33,7 @@ class MongoDB(object):
 
     def __get_all_entities(self, collection):
         for entity in self._db[collection].find():
+            logging.info("getting entities...")
             json_string = JSONEncoder().encode(entity)
 
             # decode JSON entity before appending to result list
@@ -40,12 +41,11 @@ class MongoDB(object):
 
         return self._result
 
-    def __get_all_entities_since(self, collection, since):
+    def __get_all_entities_since(self, collection, since, since_name):
         dt = datetime.strptime(since, DATETIME_FORMAT)
         logging.debug('parsed date: %s' % repr(dt))
 
-        # FIXME: property to match 'since' varies from source to source
-        for entity in self._db[collection].find({'lastModified': {'$gt': dt}}):
+        for entity in self._db[collection].find({f'{since_name}': {'$gt': dt}}):
             json_string = JSONEncoder().encode(entity)
 
             # decode JSON entity before appending to result list
@@ -53,7 +53,7 @@ class MongoDB(object):
 
         return self._result
 
-    def get_entities(self, collection, since=None):
+    def get_entities(self, collection, since=None, since_name=None):
         if since is None:
             logging.debug('getting all entities')
             return self.__get_all_entities(collection)
