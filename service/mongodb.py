@@ -59,4 +59,4 @@ class MongoDB(object):
             return self.__get_all_entities(collection)
         else:
             logging.debug('getting entities since %s' % since)
-            return self.__get_all_entities_since(collection, since)
+            return self.__get_all_entities_since(collection, since, since_name)
