@@ -45,7 +45,11 @@ def get_entities(collection):
 
     mdb = mongodb.MongoDB(uri, mongodb_database)
     since = request.args.get('since')
-    since_name = request.args.get('since_name')
+    if 'since_name' in request.args:
+        since_name = request.args.get('since_name')
+    else:
+        since_name = None
+    
     entities = mdb.get_entities(collection, since, since_name)
 
     # JSON encode result

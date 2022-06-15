@@ -33,7 +33,7 @@ class MongoDB(object):
 
     def __get_all_entities(self, collection):
         for entity in self._db[collection].find():
-            logging.info("getting entities...")
+            entity.update({"_updated": f"{entity['timeStamp']}"})
             json_string = JSONEncoder().encode(entity)
 
             # decode JSON entity before appending to result list
@@ -42,12 +42,10 @@ class MongoDB(object):
         return self._result
 
     def __get_all_entities_since(self, collection, since, since_name):
-        dt = datetime.strptime(since, DATETIME_FORMAT)
-        logging.debug('parsed date: %s' % repr(dt))
-
-        for entity in self._db[collection].find({f'{since_name}': {'$gt': dt}}):
+        for entity in self._db[collection].find({f'{since_name}': {'$gt': since}}):
+            entity.update({"_updated": f"{entity['timeStamp']}"})
             json_string = JSONEncoder().encode(entity)
-
+            
             # decode JSON entity before appending to result list
             self._result.append(json.loads(json_string))
 
@@ -55,8 +53,10 @@ class MongoDB(object):
 
     def get_entities(self, collection, since=None, since_name=None):
         if since is None:
-            logging.debug('getting all entities')
+            logging.info('getting all entities')
             return self.__get_all_entities(collection)
+            
         else:
-            logging.debug('getting entities since %s' % since)
+            logging.info('getting entities since %s' % since)
+            logging.info(f'with since marker: {since_name}')
             return self.__get_all_entities_since(collection, since, since_name)
