@@ -4,6 +4,10 @@ A python micro service for receiving a JSON entity stream from a MongoDB.
 
 ## Environment variables
 
+## since support
+
+Is enabled. Use the query parameter ``since_name`` in your inbound pipes.
+
 ### Use either
 
 `MONGODB_HOST` the hostname of the mongodb instance the source will connect
