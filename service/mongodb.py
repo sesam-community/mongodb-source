@@ -31,9 +31,12 @@ class MongoDB(object):
         self._db = self._client[database]
         self._result = []
 
-    def __get_all_entities(self, collection):
+    def __get_all_entities(self, collection, since_name):
         for entity in self._db[collection].find():
-            entity.update({"_updated": f"{entity['timeStamp']}"})
+            if since_name != None:
+                entity[since_name] = datetime.strptime(entity[since_name], "%m-%d-%Y %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
+                entity.update({"_updated": f"{entity[since_name]}"})
+            
             json_string = JSONEncoder().encode(entity)
 
             # decode JSON entity before appending to result list
@@ -42,8 +45,10 @@ class MongoDB(object):
         return self._result
 
     def __get_all_entities_since(self, collection, since, since_name):
+        since = datetime.strptime(since, "%Y-%m-%d %H:%M:%S").strftime("%m-%d-%Y %H:%M:%S") 
         for entity in self._db[collection].find({f'{since_name}': {'$gt': since}}):
-            entity.update({"_updated": f"{entity['timeStamp']}"})
+            entity[since_name] = datetime.strptime(entity[since_name], "%m-%d-%Y %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
+            entity.update({"_updated": f"{entity[since_name]}"})
             json_string = JSONEncoder().encode(entity)
             
             # decode JSON entity before appending to result list
@@ -54,7 +59,7 @@ class MongoDB(object):
     def get_entities(self, collection, since=None, since_name=None):
         if since is None:
             logging.info('getting all entities')
-            return self.__get_all_entities(collection)
+            return self.__get_all_entities(collection, since_name)
             
         else:
             logging.info('getting entities since %s' % since)
