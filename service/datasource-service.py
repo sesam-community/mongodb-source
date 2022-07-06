@@ -17,6 +17,8 @@ mongodb_username = os.getenv('MONGODB_USERNAME')
 mongodb_password = os.getenv('MONGODB_PASSWORD')
 mongodb_authSource = os.getenv('MONGODB_AUTHSOURCE', 'admin')
 mongodb_connection_string = os.getenv('MONGODB_CONNECTION_STRING')  # 'mongodb://test:test@localhost:27017/test?authSource=admin'
+mongodb_datetimeFormat = os.getenv('MONGODB_DATETIMEFORMAT', '%m-%d-%Y %H:%M:%S')
+
 
 # set logging
 log_level = logging.getLevelName(os.environ.get('LOG_LEVEL', 'INFO'))  # default log level = INFO
@@ -50,7 +52,7 @@ def get_entities(collection):
     else:
         since_name = None
     
-    entities = mdb.get_entities(collection, since, since_name)
+    entities = mdb.get_entities(collection, mongodb_datetimeFormat, since, since_name)
 
     # JSON encode result
     return Response(json.dumps(entities, separators=(',', ': ')), mimetype='application/json')

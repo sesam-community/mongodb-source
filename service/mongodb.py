@@ -31,10 +31,10 @@ class MongoDB(object):
         self._db = self._client[database]
         self._result = []
 
-    def __get_all_entities(self, collection, since_name):
+    def __get_all_entities(self, collection, since_name, mongodb_datetimeFormat):
         for entity in self._db[collection].find():
             if since_name != None:
-                entity[since_name] = datetime.strptime(entity[since_name], "%m-%d-%Y %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
+                entity[since_name] = datetime.strptime(entity[since_name], mongodb_datetimeFormat).strftime("%Y-%m-%d %H:%M:%S")
                 entity.update({"_updated": f"{entity[since_name]}"})
             
             json_string = JSONEncoder().encode(entity)
@@ -44,10 +44,10 @@ class MongoDB(object):
 
         return self._result
 
-    def __get_all_entities_since(self, collection, since, since_name):
-        since = datetime.strptime(since, "%Y-%m-%d %H:%M:%S").strftime("%m-%d-%Y %H:%M:%S") 
+    def __get_all_entities_since(self, collection, since, since_name, mongodb_datetimeFormat):
+        since = datetime.strptime(since, "%Y-%m-%d %H:%M:%S").strftime(mongodb_datetimeFormat) 
         for entity in self._db[collection].find({f'{since_name}': {'$gt': since}}):
-            entity[since_name] = datetime.strptime(entity[since_name], "%m-%d-%Y %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
+            entity[since_name] = datetime.strptime(entity[since_name], mongodb_datetimeFormat).strftime("%Y-%m-%d %H:%M:%S")
             entity.update({"_updated": f"{entity[since_name]}"})
             json_string = JSONEncoder().encode(entity)
             
@@ -56,12 +56,12 @@ class MongoDB(object):
 
         return self._result
 
-    def get_entities(self, collection, since=None, since_name=None):
+    def get_entities(self, collection, mongodb_datetimeFormat, since=None, since_name=None):
         if since is None:
             logging.info('getting all entities')
-            return self.__get_all_entities(collection, since_name)
+            return self.__get_all_entities(collection, since_name, mongodb_datetimeFormat)
             
         else:
             logging.info('getting entities since %s' % since)
             logging.info(f'with since marker: {since_name}')
-            return self.__get_all_entities_since(collection, since, since_name)
+            return self.__get_all_entities_since(collection, since, since_name, mongodb_datetimeFormat)
